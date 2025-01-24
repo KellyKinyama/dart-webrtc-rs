@@ -2,6 +2,8 @@ import 'dart:typed_data';
 
 import 'package:webrtc_rs/handshake/handshake_header.dart';
 
+import 'handshake/handshake_random.dart';
+
 enum Flight {
   Flight0,
   Flight2,
@@ -27,6 +29,14 @@ class HandshakeContext {
   int serverSequenceNumber = 0;
 
   int serverHandshakeSequenceNumber = 0;
+
+  late Uint8List serverPublicKey;
+
+  late Uint8List serverPrivateKey;
+
+  late Uint8List serverRandom;
+
+  late Uint8List clientRandom;
 
   void increaseServerSequence() {
     serverSequenceNumber++;

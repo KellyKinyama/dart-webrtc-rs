@@ -26,34 +26,34 @@ class ExtensionSupportedPointFormats {
   }
 
   // Serialize the object to bytes
-  void marshal(ByteData writer) {
-    writer.setUint16(0, 1 + pointFormats.length, Endian.big);
-    writer.setUint8(2, pointFormats.length);
+  // void marshal(ByteData writer) {
+  //   writer.setUint16(0, 1 + pointFormats.length, Endian.big);
+  //   writer.setUint8(2, pointFormats.length);
 
-    int offset = 3;
-    for (var v in pointFormats) {
-      writer.setUint8(offset, v);
-      offset += 1;
-    }
-  }
+  //   int offset = 3;
+  //   for (var v in pointFormats) {
+  //     writer.setUint8(offset, v);
+  //     offset += 1;
+  //   }
+  // }
 
   // Deserialize from bytes
-  static ExtensionSupportedPointFormats unmarshal(Uint8List bytes) {
-    if (bytes.length < EXTENSION_SUPPORTED_POINT_FORMATS_SIZE) {
-      throw FormatException("Invalid ExtensionSupportedPointFormats data");
-    }
+  // static ExtensionSupportedPointFormats unmarshal(Uint8List bytes) {
+  //   if (bytes.length < EXTENSION_SUPPORTED_POINT_FORMATS_SIZE) {
+  //     throw FormatException("Invalid ExtensionSupportedPointFormats data");
+  //   }
 
-    int pointFormatCount = bytes[2];
-    List<EllipticCurvePointFormat> pointFormats = [];
+  //   int pointFormatCount = bytes[2];
+  //   List<EllipticCurvePointFormat> pointFormats = [];
 
-    int offset = 3;
-    for (int i = 0; i < pointFormatCount; i++) {
-      pointFormats.add(bytes[offset]);
-      offset += 1;
-    }
+  //   int offset = 3;
+  //   for (int i = 0; i < pointFormatCount; i++) {
+  //     pointFormats.add(bytes[offset]);
+  //     offset += 1;
+  //   }
 
-    return ExtensionSupportedPointFormats(pointFormats: pointFormats);
-  }
+  //   return ExtensionSupportedPointFormats(pointFormats: pointFormats);
+  // }
 
   dynamic decode(int extensionLength, Uint8List buf, int offset, int arrayLen) {
     var pointFormatsCount = buf[offset];
@@ -73,22 +73,22 @@ class ExtensionSupportedPointFormats {
   }
 }
 
-void main() {
-  // Example usage
+// void main() {
+//   // Example usage
 
-  // Create a list of point formats
-  final pointFormats = [ELLIPTIC_CURVE_POINT_FORMAT_UNCOMPRESSED];
+//   // Create a list of point formats
+//   final pointFormats = [ELLIPTIC_CURVE_POINT_FORMAT_UNCOMPRESSED];
 
-  final extension = ExtensionSupportedPointFormats(pointFormats: pointFormats);
-  //print('ExtensionSupportedPointFormats: $extension');
+//   final extension = ExtensionSupportedPointFormats(pointFormats: pointFormats);
+//   //print('ExtensionSupportedPointFormats: $extension');
 
-  // Serialize to bytes
-  final buffer = ByteData(extension.size());
-  extension.marshal(buffer);
+//   // Serialize to bytes
+//   final buffer = ByteData(extension.size());
+//   extension.marshal(buffer);
 
-  // Deserialize from bytes
-  final serializedBytes = buffer.buffer.asUint8List();
-  final deserialized =
-      ExtensionSupportedPointFormats.unmarshal(serializedBytes);
-  //print('Deserialized ExtensionSupportedPointFormats: $deserialized');
-}
+//   // Deserialize from bytes
+//   final serializedBytes = buffer.buffer.asUint8List();
+//   final deserialized =
+//       ExtensionSupportedPointFormats.unmarshal(serializedBytes);
+//   //print('Deserialized ExtensionSupportedPointFormats: $deserialized');
+// }

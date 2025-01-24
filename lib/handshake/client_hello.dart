@@ -305,7 +305,7 @@ Uint8List encodeExtensionMap(Map<ExtensionType, dynamic> extensions) {
 
     // Write the extension data
     ByteData extensionData = ByteData(extensionLength);
-    extension.marshal(extensionData);
+    //extension.marshal(extensionData);
     writer.buffer.asUint8List().setRange(
         offset, offset + extensionLength, extensionData.buffer.asUint8List());
     offset += extensionLength;

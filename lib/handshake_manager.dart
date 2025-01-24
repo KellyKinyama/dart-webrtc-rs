@@ -16,6 +16,8 @@ import 'handshake/server_hello_done.dart';
 import 'handshake_context.dart';
 import 'dart:math' as dmath;
 
+import 'key_exchange_example.dart';
+
 HandshakeContext context = HandshakeContext();
 
 class HandshakeManager {
@@ -66,6 +68,26 @@ class HandshakeManager {
                 sendMessage(context, helloVerifyRequestResponse);
               }
               print("Received cookie: ${message.cookie}");
+
+              context.clientRandom = message.random.marshal();
+              context.serverRandom =
+                  HandshakeRandom.defaultInstance().marshal();
+
+              var keys = generateKeys();
+              context.serverPublicKey = keys.publicKey;
+              context.serverPrivateKey = keys.privateKey;
+
+              final clientRandomBytes = context.clientRandom;
+              final serverRandomBytes = context.serverRandom;
+
+              context.serverKeySignature = generateKeySignature(
+				clientRandomBytes,
+				serverRandomBytes,
+				context.serverPublicKey,
+				context.Curve, //x25519
+				ServerCertificate.PrivateKey,
+				context.CipherSuite.HashAlgorithm);
+
               final serverHelloResponse = createServerHello();
               sendMessage(context, serverHelloResponse);
               //m.SendMessage(context, &serverHelloResponse)certificateResponse := createDtlsCertificate()

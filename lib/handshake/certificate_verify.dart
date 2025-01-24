@@ -29,8 +29,8 @@ class HandshakeMessageCertificateVerify {
     final byteData = BytesBuilder();
 
     // Write algorithm
-    byteData.addByte(algorithm.hash.index);
-    byteData.addByte(algorithm.signature.index);
+    byteData.addByte(algorithm.hash.value);
+    byteData.addByte(algorithm.signature.value);
 
     // Write signature length
     byteData.addByte(signature.length >> 8);
