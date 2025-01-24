@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:webrtc_rs/handshake/certificate.dart';
+import 'package:webrtc_rs/handshake/certificate2.dart';
 import 'package:webrtc_rs/handshake/certificate_request.dart';
 import 'package:webrtc_rs/handshake/client_hello.dart';
 import 'package:webrtc_rs/handshake/server_hello.dart';
@@ -80,19 +80,22 @@ class HandshakeManager {
               final clientRandomBytes = context.clientRandom;
               final serverRandomBytes = context.serverRandom;
 
-              context.serverKeySignature = generateKeySignature(
-				clientRandomBytes,
-				serverRandomBytes,
-				context.serverPublicKey,
-				context.Curve, //x25519
-				ServerCertificate.PrivateKey,
-				context.CipherSuite.HashAlgorithm);
+              //       context.serverKeySignature = generateKeySignature(
+              // clientRandomBytes,
+              // serverRandomBytes,
+              // context.serverPublicKey,
+              // context.Curve, //x25519
+              // ServerCertificate.PrivateKey,
+              // context.CipherSuite.HashAlgorithm);
 
               final serverHelloResponse = createServerHello();
               sendMessage(context, serverHelloResponse);
               //m.SendMessage(context, &serverHelloResponse)certificateResponse := createDtlsCertificate()
-              final certificateResponse = createDtlsCertificate();
-              sendMessage(context, certificateResponse);
+              // final certificateResponse = createDtlsCertificate();
+
+              HandshakeMessageCertificate cert =
+                  HandshakeMessageCertificate.createSelfSignedCertificate();
+              sendMessage(context, cert);
               final serverKeyExchangeResponse = createDtlsServerKeyExchange();
               sendMessage(context, serverKeyExchangeResponse);
               final certificateRequestResponse = createDtlsCertificateRequest();

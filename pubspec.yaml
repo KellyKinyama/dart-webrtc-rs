@@ -13,6 +13,7 @@ dependencies:
   x25519: ^0.1.1
   collection: ^1.19.1
   cryptography: ^2.7.0
+  basic_utils: ^5.7.0
   # path: ^1.8.0
 
 dev_dependencies:
