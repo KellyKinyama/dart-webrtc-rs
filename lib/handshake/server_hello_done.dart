@@ -15,4 +15,9 @@ class HandshakeMessageServerHelloDone {
   Uint8List marshal() {
     return Uint8List(0);
   }
+
+  static (HandshakeMessageServerHelloDone, int, bool?) unmarshal(
+      Uint8List buf, int offset, int arrayLen) {
+    return (HandshakeMessageServerHelloDone(), offset, null);
+  }
 }

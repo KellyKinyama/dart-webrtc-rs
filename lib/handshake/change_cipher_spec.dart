@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import '../record_layer_header.dart';
 
-
 class ChangeCipherSpec {
   ContentType get contentType => ContentType.ChangeCipherSpec;
 
@@ -21,8 +20,9 @@ class ChangeCipherSpec {
     return ChangeCipherSpec();
   }
 
-  static int decode(Uint8List buf, int offset, int arrayLen) {
-    return 0;
+  static (ChangeCipherSpec, int, bool?) decode(
+      Uint8List buf, int offset, int arrayLen) {
+    return (ChangeCipherSpec(), buf[offset], null);
   }
 }
 

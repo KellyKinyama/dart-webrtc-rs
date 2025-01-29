@@ -14,30 +14,65 @@ import 'server_key_exchange.dart';
 
 enum CipherSuiteId {
   // AES-128-CCM
-  Tls_Ecdhe_Ecdsa_With_Aes_128_Ccm(0xc0ac),
-  Tls_Ecdhe_Ecdsa_With_Aes_128_Ccm_8(0xc0ae),
+  tlsEcdheEcdsaWithAes128Ccm(49324),
+  tlsEcdheEcdsaWithAes128Ccm8(49326),
 
   // AES-128-GCM-SHA256
-  Tls_Ecdhe_Ecdsa_With_Aes_128_Gcm_Sha256(0xc02b),
-  Tls_Ecdhe_Rsa_With_Aes_128_Gcm_Sha256(0xc02f),
+  tlsEcdheEcdsaWithAes128GcmSha256(49195),
+  tlsEcdheRsaWithAes128GcmSha256(49231),
 
   // AES-256-CBC-SHA
-  Tls_Ecdhe_Ecdsa_With_Aes_256_Cbc_Sha(0xc00a),
-  Tls_Ecdhe_Rsa_With_Aes_256_Cbc_Sha(0xc014),
+  tlsEcdheEcdsaWithAes256CbcSha(49162),
+  tlsEcdheRsaWithAes256CbcSha(49172),
 
-  Tls_Psk_With_Aes_128_Ccm(0xc0a4),
-  Tls_Psk_With_Aes_128_Ccm_8(0xc0a8),
-  Tls_Psk_With_Aes_128_Gcm_Sha256(0x00a8),
+  // PSK
+  tlsPskWithAes128Ccm(49316),
+  tlsPskWithAes128Ccm8(49320),
+  tlsPskWithAes128GcmSha256(168),
 
-  Unsupported(255);
+  unsupported(0);
 
   const CipherSuiteId(this.value);
   final int value;
 
   factory CipherSuiteId.fromInt(int key) {
-    return values.firstWhere((element) => element.value == key);
+    return values.firstWhere((element) => element.value == key,
+        orElse: () => CipherSuiteId.unsupported);
   }
 }
+
+// enum CipherSuiteId {
+//   // AES-128-CCM
+//   tlsEcdheEcdsaWithAes128Ccm(49324),
+//   tlsEcdheEcdsaWithAes128Ccm8(49326),
+
+//   // AES-128-GCM-SHA256
+//   tlsEcdheEcdsaWithAes128GcmSha256(49195),
+//   tlsEcdheRsaWithAes128GcmSha256(49231),
+
+//   // AES-256-CBC-SHA
+//   tlsEcdheEcdsaWithAes256CbcSha(49162),
+//   tlsEcdheRsaWithAes256CbcSha(49172),
+
+//   // PSK
+//   tlsPskWithAes128Ccm(49316),
+//   tlsPskWithAes128Ccm8(49320),
+//   tlsPskWithAes128GcmSha256(168),
+
+//   unsupported(0);
+
+//   final int value;
+
+//   const CipherSuiteId(this.value);
+
+//   /// Get the `CipherSuiteId` from its integer value.
+//   static CipherSuiteId fromValue(int value) {
+//     return CipherSuiteId.values.firstWhere(
+//       (id) => id.value == value,
+//       orElse: () => CipherSuiteId.unsupported,
+//     );
+//   }
+// }
 
 // class ExtensionSupportedEllipticCurves {
 //   final List<NamedCurve> ellipticCurves;
@@ -123,7 +158,9 @@ class HandshakeMessageClientHello {
     offset += 2;
     final cipherSuites = <CipherSuiteId>[];
     for (var i = 0; i < cipherSuitesLength; i++) {
-      final id = CipherSuiteId.fromInt(reader.getUint16(offset));
+      final cipher = reader.getUint16(offset);
+      //print("Cipher suite id: $cipher");
+      final id = CipherSuiteId.fromInt(cipher);
       cipherSuites.add(id);
       offset += 2;
     }
@@ -387,9 +424,10 @@ void main() {
   // );
 
   // Unmarshal the client hello data
-  // final clientHello = HandshakeMessageClientHello.unmarshal(rawClientHello);
-  // print('Successfully unmarshalled client hello:');
-  // print(clientHello);
+  final clientHello = HandshakeMessageClientHello.unmarshal(
+      rawClientHello, 0, rawClientHello.length);
+  print('Successfully unmarshalled client hello:');
+  print(clientHello);
 }
 
 final rawClientHello = Uint8List.fromList([

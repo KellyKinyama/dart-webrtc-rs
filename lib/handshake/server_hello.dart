@@ -193,7 +193,9 @@ class HandshakeMessageServerHello {
     return 'HandshakeMessageServerHello(version: $version, random: $random, cipherSuite: $cipherSuite, compressionMethod: $compressionMethod, extensions: $extensions)';
   }
 
-  static decode(Uint8List buf, int offset, int arrayLen) {}
+  static (dynamic, int, bool?) decode(Uint8List buf, int offset, int arrayLen) {
+    return (null, offset, null);
+  }
 }
 
 void main() {

@@ -34,9 +34,11 @@ class HandshakeContext {
 
   late Uint8List serverPrivateKey;
 
-  late Uint8List serverRandom;
+  late HandshakeRandom serverRandom;
 
   late Uint8List clientRandom;
+
+  Uint8List serverKeySignature = Uint8List(0);
 
   void increaseServerSequence() {
     serverSequenceNumber++;

@@ -214,7 +214,13 @@ class Alert {
     return 'Alert $alertLevel: $alertDescription';
   }
 
-  static decode(Uint8List buf, int offset, int arrayLen) {}
+  static (Alert, int, bool?) decode(Uint8List buf, int offset, int arrayLen) {
+    return (
+      Alert(AlertLevel.from(buf[offset]), AlertDescription.from(buf[offset++])),
+      buf[offset],
+      null
+    );
+  }
 }
 
 class ByteReader {

@@ -48,8 +48,15 @@ class HandshakeMessageClientKeyExchange {
 
   // Unmarshal from byte array
   static HandshakeMessageClientKeyExchange unmarshal(Uint8List data) {
+    print("Client key exchange data: $data");
     int pskLength = ((data[0] << 8) | data[1]);
 
+    if (pskLength > data.length - 2) {
+      throw "errBufferTooSmall";
+    }
+
+    print("Data length: ${data.length}");
+    print("PSK length: ${pskLength + 2}");
     if (data.length == pskLength + 2) {
       return HandshakeMessageClientKeyExchange(
         identityHint: data.sublist(2),
@@ -57,10 +64,12 @@ class HandshakeMessageClientKeyExchange {
       );
     }
 
-    int publicKeyLength = data[0];
-    if (data.length != publicKeyLength + 1) {
-      throw Error(); // Replace with your own error handling.
-    }
+    // print("PSK length: $pskLength");
+
+    //int publicKeyLength = data[0];
+    // if (data.length != publicKeyLength + 1) {
+    //   throw Error(); // Replace with your own error handling.
+    // }
 
     return HandshakeMessageClientKeyExchange(
       identityHint: [],
@@ -68,13 +77,32 @@ class HandshakeMessageClientKeyExchange {
     );
   }
 
+  // static HandshakeMessageClientKeyExchange unmarshal(Uint8List buf) {
+  //   int offset = 0;
+  //   final publicKeyLength = buf[offset];
+  //   offset++;
+  //   final publicKey = buf.sublist(offset, offset + publicKeyLength);
+  //   offset += (publicKeyLength);
+  //   return HandshakeMessageClientKeyExchange(
+  //     identityHint: [],
+  //     publicKey: publicKey,
+  //   );
+  // }
+
   @override
   String toString() {
     // TODO: implement toString
     return "{identityHint: $identityHint, publicKey: $publicKey}";
   }
 
-  static decode(Uint8List buf, int offset, int arrayLen) {}
+  static (HandshakeMessageClientKeyExchange, int, bool?) decode(
+      Uint8List buf, int offset, int arrayLen) {
+    return (
+      HandshakeMessageClientKeyExchange.unmarshal(buf.sublist(offset)),
+      offset,
+      null
+    );
+  }
 }
 
 void main() async {
@@ -86,16 +114,110 @@ void main() async {
 
   // Marshal the data to a byte array
   Uint8List marshalledData = handshake.marshal();
+
+  print('Marshalled: $marshalledData');
   // await File('handshake_data.dat').writeAsBytes(marshalledData);
 
   // Read the byte array back from the file and unmarshal it
   // Uint8List unmarshalledData = await File('handshake_data.dat').readAsBytes();
-  final unmarshalled =
-      HandshakeMessageClientKeyExchange.unmarshal(raw_client_key_exchange);
+  final unmarshalled = HandshakeMessageClientKeyExchange.unmarshal(raw_psk);
 
-  //print('Unmarshalled: ${unmarshalled.publicKey}');
+  print('Unmarshalled: ${unmarshalled}');
   //print('Wanted:       ${raw_client_key_exchange.sublist(1)}');
 }
+
+final raw_psk = Uint8List.fromList([
+  0,
+  21,
+  119,
+  101,
+  98,
+  114,
+  116,
+  99,
+  45,
+  114,
+  115,
+  32,
+  68,
+  84,
+  76,
+  83,
+  32,
+  83,
+  101,
+  114,
+  118,
+  101,
+  114,
+  20,
+  254,
+  253,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  3,
+  0,
+  1,
+  1,
+  22,
+  254,
+  253,
+  0,
+  1,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  40,
+  44,
+  145,
+  205,
+  20,
+  79,
+  158,
+  191,
+  100,
+  243,
+  201,
+  201,
+  189,
+  229,
+  250,
+  130,
+  239,
+  90,
+  129,
+  255,
+  105,
+  86,
+  8,
+  175,
+  228,
+  117,
+  136,
+  13,
+  24,
+  204,
+  188,
+  30,
+  216,
+  206,
+  141,
+  191,
+  170,
+  253,
+  96,
+  22,
+  150
+]);
 
 final raw_client_key_exchange = Uint8List.fromList([
   0x20,

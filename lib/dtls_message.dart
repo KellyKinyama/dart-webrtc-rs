@@ -9,9 +9,11 @@ import 'handshake/certificate_verify.dart';
 import 'handshake/change_cipher_spec.dart';
 import 'handshake/client_hello.dart';
 import 'handshake/client_key_exchange.dart';
+import 'handshake/finished.dart';
 import 'handshake/handshake_header.dart';
 import 'handshake/hello_verify_request.dart';
 import 'handshake/server_hello.dart';
+import 'handshake/server_hello_done.dart';
 import 'handshake/server_key_exchange.dart';
 import 'record_layer_header.dart';
 
@@ -88,7 +90,7 @@ class DecodeDtlsMessageResult {
           if (handshakeHeader.length.value !=
               handshakeHeader.fragmentLength.value) {
             // Ignore fragmented packets
-            //print('Ignore fragmented packets: ${header.contentType}');
+            print('Ignore fragmented packets: ${header.contentType}');
             return DecodeDtlsMessageResult(null, null, null, offset);
           }
 
@@ -114,64 +116,72 @@ class DecodeDtlsMessageResult {
               header, handshakeHeader, result, offset);
         }
       case ContentType.ChangeCipherSpec:
-        final changeCipherSpec = ChangeCipherSpec();
-        offset = ChangeCipherSpec.decode(buf, offset, arrayLen);
-        return DecodeDtlsMessageResult(header, null, changeCipherSpec, offset);
+        //final changeCipherSpec = ChangeCipherSpec();
+        var (ccs, decoffset, err) =
+            ChangeCipherSpec.decode(buf, offset, arrayLen);
+        return DecodeDtlsMessageResult(header, null, ccs, decoffset);
       case ContentType.Alert:
         Alert alert;
         if (decryptedBytes == null) {
           var (decodedAlert, decodedOffset, err) =
               Alert.decode(buf, offset, arrayLen);
           alert = decodedAlert;
+          //print("alert: ${buf.sublist(offset)}");
+          return DecodeDtlsMessageResult(header, null, decodedAlert, offset);
         } else {
-          alert = Alert.decode(decryptedBytes, 0, decryptedBytes.length);
+          var (decodedAlert, decodedOffset, err) =
+              Alert.decode(decryptedBytes, 0, decryptedBytes.length);
+          //print("alert: ${buf.sublist(offset)}");
+          alert = decodedAlert;
+          return DecodeDtlsMessageResult(header, null, decodedAlert, offset);
         }
 
-        //context.serverSequenceNumber = 0;
-        //context.flight = Flight.Flight0;
-        return DecodeDtlsMessageResult(header, null, alert, offset);
+      //context.serverSequenceNumber = 0;
+      //context.flight = Flight.Flight0;
+      //return DecodeDtlsMessageResult(header, null, alert, offset);
       default:
         throw ArgumentError(DtlsErrors.errUnknownDtlsContentType);
     }
   }
 }
 
-dynamic decodeHandshake(RecordLayerHeader header,
+(dynamic, int, bool?) decodeHandshake(RecordLayerHeader header,
     HandshakeHeader handshakeHeader, Uint8List buf, int offset, int arrayLen) {
   // late BaseDtlsMessage result;
   dynamic result;
   switch (handshakeHeader.handshakeType) {
     case HandshakeType.ClientHello:
-      result = HandshakeMessageClientHello.unmarshal(buf, offset, arrayLen);
-      break;
+      return HandshakeMessageClientHello.unmarshal(buf, offset, arrayLen);
+    //break;
     case HandshakeType.HelloVerifyRequest:
-      result =
-          HandshakeMessageHelloVerifyRequest.unmarshal(buf, offset, arrayLen);
-      break;
+      return HandshakeMessageHelloVerifyRequest.unmarshal(
+          buf, offset, arrayLen);
+
     case HandshakeType.ServerHello:
-      result = HandshakeMessageServerHello.decode(buf, offset, arrayLen);
-      break;
+      return HandshakeMessageServerHello.decode(buf, offset, arrayLen);
+
     case HandshakeType.Certificate:
-      result = HandshakeMessageCertificate.decode(buf, offset, arrayLen);
-      break;
+      return HandshakeMessageCertificate.decode(buf, offset, arrayLen);
+
     case HandshakeType.ServerKeyExchange:
       result = HandshakeMessageServerKeyExchange.decode(buf, offset, arrayLen);
       break;
     case HandshakeType.CertificateRequest:
-      result = HandshakeMessageCertificateRequest.decode(buf, offset, arrayLen);
-      break;
-    // case HandshakeType.ServerHelloDone:
-    //   result = HandshakeMessageServerHelloDone(;
-    //   break;
+      return HandshakeMessageCertificateRequest.decode(buf, offset, arrayLen);
+
+    case HandshakeType.ServerHelloDone:
+      return HandshakeMessageServerHelloDone.unmarshal(buf, offset, arrayLen);
+
     case HandshakeType.ClientKeyExchange:
-      result = HandshakeMessageClientKeyExchange.decode(buf, offset, arrayLen);
-      break;
+      print("Handshake: $handshakeHeader");
+      return HandshakeMessageClientKeyExchange.decode(buf, offset, arrayLen);
+
     case HandshakeType.CertificateVerify:
-      result = HandshakeMessageCertificateVerify.decode(buf, offset, arrayLen);
+      return HandshakeMessageCertificateVerify.decode(buf, offset, arrayLen);
+
+    case HandshakeType.Finished:
+      result = HandshakeMessageFinished.unmarshal(buf);
       break;
-    // case HandshakeType.Finished:
-    //   result = HandshakeMessageFinished();
-    //   break;
     default:
       print("Unkown handshake type: ${handshakeHeader.handshakeType}");
       throw ArgumentError(DtlsErrors.errUnknownDtlsHandshakeType);

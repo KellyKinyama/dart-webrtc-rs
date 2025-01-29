@@ -102,6 +102,34 @@ void useX25519() {
   return (privateKey: privKey, publicKey: pubKey);
 }
 
+Future<({Uint8List privateKey, Uint8List publicKey})>
+    generateEd25519Keys() async {
+  final algorithm = cryptography.Ed25519();
+
+  // Generate key pair
+  final keyPair = await algorithm.newKeyPair();
+  final privateKey = await keyPair.extractPrivateKeyBytes();
+  final publicKey = await keyPair.extractPublicKey();
+
+  print('Private Key (Base64): ${base64Encode(privateKey)}');
+  print('Public Key (Base64): ${base64Encode(publicKey.bytes)}');
+  print('Private Key length: ${privateKey.length}');
+  print('Public Key length: ${publicKey.bytes.length}');
+
+  // Sign a message
+  final message = utf8.encode('This is a test message.');
+  final signature = await algorithm.sign(
+    message,
+    keyPair: keyPair,
+  );
+
+  print('Signature: ${base64Encode(signature.bytes)}');
+  return (
+    privateKey: Uint8List.fromList(privateKey),
+    publicKey: Uint8List.fromList(publicKey.bytes)
+  );
+}
+
 void main() async {
   final algorithm = cryptography.Ed25519();
 

@@ -76,7 +76,7 @@ class HandshakeMessageHelloVerifyRequest {
   }
 
   /// Deserializes a byte buffer into a `HandshakeMessageHelloVerifyRequest` object.
-  static HandshakeMessageHelloVerifyRequest unmarshal(
+  static (HandshakeMessageHelloVerifyRequest, int, bool?) unmarshal(
       Uint8List data, int offset, int arrayLen) {
     if (data.length < 3) {
       throw HandshakeError('Buffer too small for unmarshalling.');
@@ -92,9 +92,13 @@ class HandshakeMessageHelloVerifyRequest {
 
     final cookie = data.sublist(offset + 3, offset + 3 + cookieLength);
 
-    return HandshakeMessageHelloVerifyRequest(
-      version: ProtocolVersion(major: major, minor: minor),
-      cookie: cookie,
+    return (
+      HandshakeMessageHelloVerifyRequest(
+        version: ProtocolVersion(major: major, minor: minor),
+        cookie: cookie,
+      ),
+      0,
+      null
     );
   }
 
